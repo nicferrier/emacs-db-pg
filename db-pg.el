@@ -1,4 +1,33 @@
-;;; emacs-db for pg
+;;; db-pg.el --- A PostgreSQL adapter for emacs-db
+
+;; Copyright (C) 2012  Nic Ferrier
+;; Author: Nic Ferrier <nic@ferrier.me.uk>
+;; Version: 0.0.2
+;; Keywords: data comm database postgresql
+;; Created: 23 December 2012
+;; Package-Requires: ((pg "0.12")(db "0.0.2"))
+
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; This is a PostgreSQL adapter for emacs-db. Emacs-DB can be found in
+;; the Marmalade repository.
+
+;; See the README for usage.
+
 
 (require 'pg)
 
