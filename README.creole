@@ -1,0 +1,59 @@
+a Postgresql interface for {{{emacs-db}}}, the basic database
+interface for EmacsLisp.
+
+== Example usage ==
+
+Here's a small example that shows, at least, how to specify the
+connection details:
+
+{{{
+##! emacs-lisp
+(let ((db (db-make '(db-pg
+                     :db "my-db" :username "nic"
+                     :table "t1" :column "c1" :key "a"))))
+    (db-get "10" db))
+
+=> '(("a" . 10)("b" . "20"))
+}}}
+
+
+== A note on Hstores with Postgresql ==
+
+This relies on a feature of Postgresql called hstore's. Hstores are
+key/value stores in Postgresql.
+
+A single hstore column is used to store the key/values for any
+particular database instance in {{{db-pg}}}.
+
+You can create an Hstore column in Postgresql like this:
+
+{{{
+create table my_table
+(my_column hstore);
+}}}
+
+The hstore column is all that's important to {{{db-pg}}}. It doesn't
+care what else is in the table, the table could have many more
+columns.
+
+=== Futures ===
+
+In the near future I hope {{{db-pg}}} will create tables based on some
+template that you can supply.
+
+
+== Tests ==
+
+There are tests but most of them require a real postgresql. The table
+used is created like this:
+
+{{{
+create table t1 (c1 hstore);
+}}}
+
+in the database {{{nictest1}}}.
+
+
+== Emacs all the way down ==
+
+Postgresql is the Emacs of the database world. So combine the two!
