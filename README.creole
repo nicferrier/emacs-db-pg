@@ -28,6 +28,7 @@ particular database instance in {{{db-pg}}}.
 You can create an Hstore column in Postgresql like this:
 
 {{{
+##! sql
 create table my_table
 (my_column hstore);
 }}}
