@@ -1,5 +1,5 @@
 a Postgresql interface for
-[[http://github.com/nicferrier/emacs-db|{{{emacs-db}}}]], the basic
+[[http://github.com/nicferrier/emacs-db|emacs-db]], the basic
 database interface for EmacsLisp.
 
 == Example usage ==
