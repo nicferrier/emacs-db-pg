@@ -8,9 +8,11 @@ connection details:
 
 {{{
 ##! emacs-lisp
-(let ((db (db-make '(db-pg
-                     :db "my-db" :username "nic"
-                     :table "t1" :column "c1" :key "a"))))
+(let ((db 
+        (db-make 
+          '(db-pg
+             :db "my-db" :username "nic"
+             :table "t1" :column "c1" :key "a"))))
     (db-get "10" db))
 
 => '(("a" . 10)("b" . "20"))
