@@ -88,8 +88,7 @@ And can also include:
 
 This function checks for the existance of `:table' and if it does
 not exist it causes the table to be created with the necessary
-HSTORE column by the function `db-pg/create-table'.
-"
+HSTORE column by the function `db-pg/create-table'."
   (destructuring-bind (&key
                        db
                        username
