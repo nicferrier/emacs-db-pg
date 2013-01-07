@@ -4,17 +4,33 @@
 (require 'db-pg)
 (require 'ert)
 
+;; All of these tests have the problem that they need my database to
+;; create them
+
+;; The creation of the database should:
+;;
+;; * create the db `db-pg-tests-db'
+;; * turn on the hstore extension in it
+;;    CREATE EXTENSION hstore;
+;; * turn on json stuff in it?
+;;    ??
+
+
+(defconst db-pg-tests-db "emacs-db-pg-test"
+  "The name we use for the tests.")
+
+
 (ert-deftest db-pg ()
   "Test the reference creation stuff."
   (should
    (equal
-    (list :db "my-db" :username "nic"
+    (list :db db-pg-tests-db :username "nferrier"
           :host "localhost" :password "" :port 5432
           :table "t1" :column "c1" :key "a")
     (plist-get
      ;; The reference has to start with db-pg symbol
      (db-pg (list 'db-pg
-                  :db "my-db" :username "nic"
+                  :db db-pg-tests-db :username "nferrier"
                   :table "t1" :column "c1" :key "a"))
      :pg-spec))))
 
@@ -24,32 +40,52 @@
     (should
      (equal
       (list :get 'db-pg/get :put 'db-pg/put :map 'db-pg/map
-            :pg-spec (list :db "my-db" :username "nic"
+            :pg-spec (list :db db-pg-tests-db :username "nferrier"
                           :host "localhost" :password "" :port 5432
                           :table "t1" :column "c1" :key "a"))
-      (db-make '(db-pg
-                 :db "my-db" :username "nic"
+      (db-make `(db-pg
+                 :db ,db-pg-tests-db :username "nferrier"
                  :table "t1" :column "c1" :key "a"))))))
 
 (ert-deftest db-pg/ref->spec ()
   (let ((db/types (db/make-type-store)))
     (puthash 'db-pg 'db-pg db/types)
-    (let ((db (db-make '(db-pg
-                         :db "my-db" :username "nic"
+    (let ((db (db-make `(db-pg
+                         :db ,db-pg-tests-db :username "nferrier"
                          :table "t1" :column "c1" :key "a"))))
       (should
        (equal
-        (list "my-db" "nic" "" "localhost" 5432)
+        (list db-pg-tests-db "nferrier" "" "localhost" 5432)
         (db-pg/ref->spec db))))))
+
+(defun db-pg/test-insert (db alist)
+  "Testing function inserts ALIST as an HSTORE into DB."
+  (with-pg-connection con (db-pg/ref->spec db)
+    (let* ((pg-spec (plist-get db :pg-spec))
+           (table (plist-get pg-spec :table))
+           (column (plist-get pg-spec :column))
+           (vals (mapconcat
+                  (lambda (v)
+                    (format
+                     "%s=>%s"
+                     (car v) (cdr v))) alist ",")))
+      (pg:exec
+       con
+       (format "truncate table %s" table))
+      (pg:exec
+       con
+       (format "insert into %s (%s) values ('%s')"
+               table column vals)))))
 
 ;; This requires a working db
 (ert-deftest db-pg/get ()
   (let ((db/types (db/make-type-store)))
     (puthash 'db-pg 'db-pg db/types)
     (let ((db (db-make
-               '(db-pg
-                 :db "nictest1" :username "nferrier"
+               `(db-pg
+                 :db ,db-pg-tests-db :username "nferrier"
                  :table "t1" :column "c1" :key "a"))))
+      (db-pg/test-insert db '(("g" . 10)(a . t1)))
       (should
        (equal
         '((("g" . "10")("a" . "t1")))
@@ -59,8 +95,8 @@
   (let ((db/types (db/make-type-store)))
     (puthash 'db-pg 'db-pg db/types)
     (let ((db (db-make
-               '(db-pg
-                 :db "nictest1" :username "nferrier"
+               `(db-pg
+                 :db ,db-pg-tests-db :username "nferrier"
                  :table "t1" :column "c1" :key "a"))))
       (should
        (equal
@@ -71,9 +107,10 @@
   (let ((db/types (db/make-type-store)))
     (puthash 'db-pg 'db-pg db/types)
     (let ((db (db-make
-               '(db-pg
-                 :db "nictest1" :username "nferrier"
+               `(db-pg
+                 :db ,db-pg-tests-db :username "nferrier"
                  :table "t1" :column "c1" :key "a"))))
+      (db-pg/test-insert db '(("g" . 10)(a . t1)))
       (should
        (equal
         '((("g" . "10")("a" . "t1")))
@@ -83,8 +120,8 @@
   (let ((db/types (db/make-type-store)))
     (puthash 'db-pg 'db-pg db/types)
     (let ((db (db-make
-               '(db-pg
-                 :db "nictest1" :username "nferrier"
+               `(db-pg
+                 :db ,db-pg-tests-db :username "nferrier"
                  :table "t1" :column "c1" :key "a"))))
       (should
        (equal
