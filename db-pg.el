@@ -111,8 +111,8 @@ HSTORE column by the function `db-pg/create-table'.
       ;; Check that the table exists
       (with-pg-connection
           con (db-pg/ref->spec db-spec)
-        (let ((tables (db-pg/list-tables con))
-              (table-exists (member table tables)))
+        (let* ((tables (db-pg/list-tables con))
+               (table-exists (member table tables)))
           (unless table-exists
             (db-pg/create-table con table column))))
       ;; Return the database
