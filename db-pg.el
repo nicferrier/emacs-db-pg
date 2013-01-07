@@ -85,6 +85,10 @@ And can also include:
 
   `:host' key with a postgresql server hostname
   `:port' key with the tcp port of the postgresql server
+
+This function checks for the existance of `:table' and if it does
+not exist it causes the table to be created with the necessary
+HSTORE column by the function `db-pg/create-table'.
 "
   (destructuring-bind (&key
                        db
