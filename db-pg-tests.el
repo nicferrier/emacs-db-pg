@@ -1,5 +1,9 @@
 ;;;  db-pg-tests - tests for postgresql database
 
+(require 'db)
+(require 'db-pg)
+(require 'ert)
+
 (ert-deftest db-pg ()
   "Test the reference creation stuff."
   (should
@@ -74,5 +78,17 @@
        (equal
         '((("g" . "10")("a" . "t1")))
         (db-map (lambda (key val) val) db))))))
+
+(ert-deftest db-pg/query ()
+  (let ((db/types (db/make-type-store)))
+    (puthash 'db-pg 'db-pg db/types)
+    (let ((db (db-make
+               '(db-pg
+                 :db "nictest1" :username "nferrier"
+                 :table "t1" :column "c1" :key "a"))))
+      (should
+       (equal
+        '(("t1" ("g" . "10")("a" . "t1")))
+        (db-query db '((= "g" 10))))))))
 
 ;;; db-pg-tests.el ends here
