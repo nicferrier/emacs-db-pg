@@ -29,6 +29,46 @@
 
 
 (require 'pg)
+(require 'json)
+(require 'db)
+
+(defconst db-pg/table-query
+  "select c.relname
+from pg_catalog.pg_class c
+  left join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'"
+  "The query we use to find the list of tables.
+
+This isn't ideal because it forces the use of 'public' as the
+schema name but that could be fixed if we ever need non-public
+schemas (we will).")
+
+(defun db-pg/list-tables (con)
+  "Get the list of tables from connection CON."
+  (let ((res (pg:exec con db-pg/table-query)))
+    (loop for row in (pg:result res :tuples)
+       collect (car row))))
+
+(defun db-pg/ref->spec (ref)
+  "Convert the `db' REF to `pg:connect' details."
+  (let ((pg-spec (plist-get ref :pg-spec)))
+    (list (plist-get pg-spec :db)
+          (plist-get pg-spec :username)
+          ;; FIXME - work out how to get defaults into here
+          (or (plist-get pg-spec :password) "")
+          (or (plist-get pg-spec :host) "localhost")
+          (or (plist-get pg-spec :port) 5432))))
+
+(defun db-pg/create-table (con table column)
+  "Create a suitable TABLE with COLUMN for db-pg use."
+  (let ((result
+         (pg:exec
+          con
+          (format
+           "create table %s (%s hstore);"
+           table
+           column))))
+    (pg:result result :status)))
 
 (defun db-pg (reference)
   "Make a Postgresql database utlizing Hstore types.
@@ -55,27 +95,25 @@ And can also include:
                        table
                        column
                        key) (cdr reference)
-    (let ((db-spec
-           (list
-            :get 'db-pg/get
-            :put 'db-pg/put
-            :map 'db-pg/map
-            :pg-spec
-            (list :db db :username username
-                  :host host :password password :port port
-                  :table table :column column :key key))))
+    (let* ((db-spec
+            (list
+             :get 'db-pg/get
+             :put 'db-pg/put
+             :map 'db-pg/map
+             :pg-spec
+             (list :db db :username username
+                   :host host :password password :port port
+                   :table table :column column :key key))))
+      ;; Check that the table exists
+      (with-pg-connection
+          con (db-pg/ref->spec db-spec)
+        (let ((tables (db-pg/list-tables con))
+              (table-exists (member table tables)))
+          (unless table-exists
+            (db-pg/create-table con table column))))
       ;; Return the database
       db-spec)))
 
-(defun db-pg/ref->spec (ref)
-  "Convert the `db' REF to `pg:connect' details."
-  (let ((pg-spec (plist-get ref :pg-spec)))
-    (list (plist-get pg-spec :db)
-          (plist-get pg-spec :username)
-          ;; FIXME - work out how to get defaults into here
-          (or (plist-get pg-spec :password) "")
-          (or (plist-get pg-spec :host) "localhost")
-          (or (plist-get pg-spec :port) 5432))))
 
 (defun db-pg/alist->hstore (alist)
   "Convert ALIST to a potsgresql Hstore representation.

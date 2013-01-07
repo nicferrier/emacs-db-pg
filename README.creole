@@ -40,10 +40,13 @@ The hstore column is all that's important to {{{db-pg}}}. It doesn't
 care what else is in the table, the table could have many more
 columns.
 
-=== Futures ===
+=== Table creation ===
 
-In the near future I hope {{{db-pg}}} will create tables based on some
-template that you can supply.
+//db-pg// will test for existance of the specified table when the
+{{{db-make}}} is evaluated. If the table does not exist it is created
+by {{{db-pg/create-table}}}.
+
+In the future the CREATE TABLE will likely be customizable.
 
 
 == Tests ==
