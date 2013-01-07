@@ -131,7 +131,12 @@ Hstore representation is like this: key-a=>value,key-b=>value."
 
 (defun db-pg/select (column table &optional where-key where-val)
   (format
-   "select to_json(%s) from %s%s" column table
+   "select '{' ||
+  (select array_to_string(array_agg('\"'
+   || item.key || '\":\"'
+   || item.value || '\"'), ',') from each(%s) item) || '}'
+  from %s%s"
+   column table
    (if where-key
        (format
         " where %s::hstore -> '%s' = '%s'"
