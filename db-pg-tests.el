@@ -8,17 +8,16 @@
 ;; All of these tests have the problem that they need my database to
 ;; create them
 
-;; The creation of the database should:
-;;
-;; * create the db `db-pg-tests-db'
-;; * turn on the hstore extension in it
-;;    CREATE EXTENSION hstore;
-;; * turn on json stuff in it?
-;;    ??
 
 
 (defconst db-pg-tests-db "emacs-db-pg-test"
   "The name we use for the tests.")
+
+;; The creation of the database should:
+;;
+;; * create the db `db-pg-tests-db'
+;; * turn on the hstore extension in it
+;;    psql `db-pg-tests-db' -e 'CREATE EXTENSION hstore';
 
 
 (ert-deftest db-pg ()
