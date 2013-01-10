@@ -58,6 +58,21 @@
         (list db-pg-tests-db "nferrier" "" "localhost" 5432)
         (db-pg/ref->spec db))))))
 
+(defun db-pg/truncate (db &optional con)
+  "Truncate the table specified in DB.
+
+If CON is supplied it's presumed to be an open DB connection."
+  (flet ((truncate (con table)
+           (pg:exec
+            con
+            (format "truncate table %s" table))))
+    (let* ((pg-spec (plist-get db :pg-spec))
+           (table (plist-get pg-spec :table)))
+      (if con
+          (truncate con table)
+          (with-pg-connection con (db-pg/ref->spec db)
+            (truncate con table))))))
+
 (defun db-pg/test-insert (db alist)
   "Testing function inserts ALIST as an HSTORE into DB."
   (with-pg-connection con (db-pg/ref->spec db)
@@ -69,9 +84,7 @@
                     (format
                      "%s=>%s"
                      (car v) (cdr v))) alist ",")))
-      (pg:exec
-       con
-       (format "truncate table %s" table))
+      (db-pg/truncate db con)
       (pg:exec
        con
        (format "insert into %s (%s) values ('%s')"
@@ -98,6 +111,13 @@
                `(db-pg
                  :db ,db-pg-tests-db :username "nferrier"
                  :table "t1" :column "c1" :key "a"))))
+      ;; Test an insert
+      (db-pg/truncate db)
+      (should
+       (equal
+        '((("g" . "12")("a" . "t1")))
+        (db-put "a" '(("a" . "t1")("g" . 12)) db)))
+      ;; Test an update
       (should
        (equal
         '((("g" . "10")("a" . "t1")))

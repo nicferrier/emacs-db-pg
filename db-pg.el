@@ -201,18 +201,18 @@ Hstore representation is like this: key-a=>value,key-b=>value."
   (let ((db-spec (db-pg/ref->spec db)))
     (with-pg-connection con db-spec
       ;; FIXME - what if the key is not in the value?
-      (let* ((key-val (aget value key))
+      (let* ((key-val (aget value key)) ;; not sure what this is for
              (pg-spec (plist-get db :pg-spec))
              (column (plist-get pg-spec :column))
              (table (plist-get pg-spec :table))
-             (key (plist-get pg-spec :key))
-             (select-sql (db-pg/select column table key key-val))
+             (key-name (plist-get pg-spec :key))
+             (select-sql (db-pg/select column table key-name key-val))
              (result (pg:exec con select-sql))
              (row (pg:result result :tuples)))
         (if row
             (pg:exec
              con
-             (db-pg/update column table value key key-val))
+             (db-pg/update column table value key-name key-val))
             ;; Else insert
             (pg:exec
              con (db-pg/insert column table value)))
