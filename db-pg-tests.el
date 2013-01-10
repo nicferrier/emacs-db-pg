@@ -3,6 +3,7 @@
 (require 'db)
 (require 'db-pg)
 (require 'ert)
+(require 'cl)
 
 ;; All of these tests have the problem that they need my database to
 ;; create them
