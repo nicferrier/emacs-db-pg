@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2012  Nic Ferrier
 ;; Author: Nic Ferrier <nic@ferrier.me.uk>
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Keywords: data comm database postgresql
 ;; Created: 23 December 2012
 ;; Package-Requires: ((pg "0.12")(db "0.0.6"))
