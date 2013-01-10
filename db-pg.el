@@ -5,7 +5,7 @@
 ;; Version: 0.0.2
 ;; Keywords: data comm database postgresql
 ;; Created: 23 December 2012
-;; Package-Requires: ((pg "0.12")(db "0.0.2"))
+;; Package-Requires: ((pg "0.12")(db "0.0.6"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
