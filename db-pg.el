@@ -133,7 +133,7 @@ Hstore representation is like this: key-a=>value,key-b=>value."
    "select '{' ||
   (select array_to_string(array_agg('\"'
    || item.key || '\":\"'
-   || item.value || '\"'), ',') from each(%s) item) || '}'
+   || item.value || '\"'), ',') as json from each(%s) item) || '}'
   from %s%s"
    column table
    (if where-key
