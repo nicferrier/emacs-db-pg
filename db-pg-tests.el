@@ -101,7 +101,7 @@ If CON is supplied it's presumed to be an open DB connection."
       (db-pg/test-insert db '(("g" . 10)(a . t1)))
       (should
        (equal
-        '((("g" . "10")("a" . "t1")))
+        '(("g" . "10")("a" . "t1"))
         (db-get "t1" db))))))
 
 (ert-deftest db-pg/put ()
@@ -115,12 +115,12 @@ If CON is supplied it's presumed to be an open DB connection."
       (db-pg/truncate db)
       (should
        (equal
-        '((("g" . "12")("a" . "t1")))
+        '(("g" . "12")("a" . "t1"))
         (db-put "a" '(("a" . "t1")("g" . 12)) db)))
       ;; Test an update
       (should
        (equal
-        '((("g" . "10")("a" . "t1")))
+        '(("g" . "10")("a" . "t1"))
         (db-put "a" '(("a" . "t1")("g" . 10)) db))))))
 
 (ert-deftest db-pg/map ()
