@@ -27,7 +27,6 @@
 
 ;; See the README for usage.
 
-
 (require 'pg)
 (require 'json)
 (require 'db)
@@ -195,7 +194,8 @@ Hstore representation is like this: key-a=>value,key-b=>value."
             (append
              collector
              (list (db-pg/json-decode (caar result)))))))
-        collector))))
+        ;; We only want the first one
+        (car collector)))))
 
 (defun db-pg/put (key value db)
   (let ((db-spec (db-pg/ref->spec db)))
