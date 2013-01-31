@@ -201,23 +201,22 @@ Hstore representation is like this: key-a=>value,key-b=>value."
   (let ((db-spec (db-pg/ref->spec db)))
     (with-pg-connection con db-spec
       ;; FIXME - what if the key is not in the value?
-      (let* ((key-val (aget value key)) ;; not sure what this is for
-             (pg-spec (plist-get db :pg-spec))
+      (let* ((pg-spec (plist-get db :pg-spec))
              (column (plist-get pg-spec :column))
              (table (plist-get pg-spec :table))
              (key-name (plist-get pg-spec :key))
-             (select-sql (db-pg/select column table key-name key-val))
+             (select-sql (db-pg/select column table key-name key))
              (result (pg:exec con select-sql))
              (row (pg:result result :tuples)))
         (if row
             (pg:exec
              con
-             (db-pg/update column table value key-name key-val))
+             (db-pg/update column table value key-name key))
             ;; Else insert
             (pg:exec
              con (db-pg/insert column table value)))
         ;; Now something to return
-        (db-pg/get key-val db)))))
+        (db-pg/get key db)))))
 
 (defun db-pg/map (func db &optional query filter)
   "Call FUNC for every value in DB or just those matching QUERY.
